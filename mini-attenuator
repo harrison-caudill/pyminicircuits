@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+
+import argparse
+import minicircuits
+import sys
+
+
+def main():
+    desc="""
+    Commnad-line interface to control mini-circuits digital attenuators.
+    """
+    parser = argparse.ArgumentParser(description=desc)
+
+    commands = ['get', 'set', 'firmware', 'serial', 'parser']
+
+    parser.add_argument(help="Command to execute",
+                        action="store",
+                        dest="cmd",
+                        choices=commands,
+                        metavar="COMMAND")
+
+    parser.add_argument("-v", "--value",
+                        help="New Attenuation Value (0-125, 0.25 increments)",
+                        type=float,
+                        action="store",
+                        required=False,
+                        dest="att",
+                        metavar="ATTENUATION",
+                        default=125.0)
+
+    parser.add_argument("-m", "--model",
+                        help="Attenuator Model Number",
+                        type=str,
+                        action="store",
+                        required=False,
+                        dest="model",
+                        metavar="MODEL",
+                        default="RCDAT-4000-120")
+
+    args = parser.parse_args()
+
+    product_id = minicircuits.DigitalAttenuator.PRODUCT_IDS[args.model]
+    att = minicircuits.DigitalAttenuator(product_id)
+
+    if args.cmd == 'get':
+        print att.get_att()
+    elif args.cmd == 'set':
+        att.set_att(args.att)
+        print att.get_att()
+    elif args.cmd == 'firmware':
+        print att.get_firmware_rev()
+    elif args.cmd == 'serial':
+        print att.get_serial()
+    elif args.cmd == 'model':
+        print att.get_model()
+
+if __name__ == '__main__':
+    sys.exit(main())
